@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة داود وجليات</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Tahoma', sans-serif;
+      direction: rtl;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* خلفية الفيديو */
+    #backgroundVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+      display: none; 
+    }
+
+    /* زر الصوت */
+    #soundToggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+      z-index: 2;
+    }
+
+    /* محتوى اللعبة */
+    .content {
+      position: relative;
+      z-index: 1;
+      top: 30%;
+      transform: translateY(-30%);
+      transition: opacity 0.8s ease;
+    }
+
+    input {
+      padding: 10px;
+      width: 60%;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      color: #333;
+    }
+
+    input:focus {
+      border-color: #2c3e50;
+    }
+
+    #message {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: yellow;
+    }
+
+    h1 {
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    }
+
+    p {
+      font-size: 18px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    }
+
+    /* عند الإخفاء */
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- فيديو الخلفية -->
+  <iframe id="backgroundVideo"
+    src=""
+    frameborder="0" allow="autoplay; fullscreen">
+  </iframe>
+
+  <!-- زر التحكم في الصوت -->
+  <button id="soundToggle">🔊 تشغيل الصوت</button>
+
+  <!-- محتوى اللعبة -->
+  <div class="content" id="contentBox">
+    <h1>قصة داود وجليات</h1>
+    <p>اكتب الآية الصحيحة لتشغيل الفيديو.</p>
+    
+    <input type="text" id="verseInput" placeholder="اكتب الآية هنا">
+    <p id="message"></p>
+  </div>
+
+  <script>
+    function normalize(text) {
+      // إزالة التشكيل
+      text = text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, "");
+      // توحيد الهمزات والألف
+      text = text.replace(/[أإآا]/g, "ا");
+      // تحويل إلى حروف صغيرة
+      text = text.toLowerCase();
+      // إزالة المسافات الزايدة
+      text = text.replace(/\s+/g, " ").trim();
+      return text;
+    }
+
+    var correctVerses = [
+      "انت تاتي الي بسيف وبرمح وترس وانا اتي اليك باسم رب الجنود",
+      "انت تأتيني بسيف وبرمح وترس وانا آتيك باسم رب الجنود"
+    ];
+
+    var input = document.getElementById("verseInput");
+    var message = document.getElementById("message");
+    var backgroundVideo = document.getElementById("backgroundVideo");
+    var contentBox = document.getElementById("contentBox");
+    var soundToggle = document.getElementById("soundToggle");
+
+    var solved = false;
+    var videoId = "Nqwdf8BveVw";
+    var isMuted = true;
+
+    input.addEventListener("input", function() {
+      if (solved) return;
+
+      var userInput = normalize(input.value);
+      var isCorrect = correctVerses.some(v => normalize(v) === userInput);
+
+      if (isCorrect) {
+        solved = true;
+        backgroundVideo.style.display = "block";
+        backgroundVideo.src = "https://www.youtube.com/embed/" + videoId +
+          "?autoplay=1&controls=0&loop=1&playlist=" + videoId + "&mute=1";
+
+        message.style.color = "lime";
+        message.textContent = "صحيح! الفيديو يعمل الآن.";
+
+        setTimeout(function() {
+          contentBox.classList.add("hidden");
+        }, 1500);
+
+        soundToggle.style.display = "block";
+      } else {
+        message.style.color = "yellow";
+        message.textContent = "الآية غير صحيحة، حاول مرة أخرى.";
+      }
+    });
+
+    soundToggle.addEventListener("click", function() {
+      if (isMuted) {
+        backgroundVideo.src = "https://www.youtube.com/embed/" + videoId +
+          "?autoplay=1&controls=0&loop=1&playlist=" + videoId;
+        soundToggle.textContent = "🔇 كتم الصوت";
+        isMuted = false;
+      } else {
+        backgroundVideo.src = "https://www.youtube.com/embed/" + videoId +
+          "?autoplay=1&controls=0&loop=1&playlist=" + videoId + "&mute=1";
+        soundToggle.textContent = "🔊 تشغيل الصوت";
+        isMuted = true;
+      }
+    });
+  </script>
+</body>
+</html>
